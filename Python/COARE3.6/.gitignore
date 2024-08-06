@@ -1,0 +1,14 @@
+dask_worker_space/
+*.nc
+*.txt
+.ipynb_checkpoints/
+**.log
+**/log
+**/dask_worker_space/**
+*.pyc
+*.dirlock
+*.lock
+*.csv
+*.png
+*core*
+*.npy

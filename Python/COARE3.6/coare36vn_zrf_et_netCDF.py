@@ -24,6 +24,7 @@ v1: August 2022
 """
 import numpy as np
 import os
+import xarray as xr
     
 def coare36vn_zrf_et(u, zu , t, zt, rh, zq, P, ts, sw_dn, lw_dn, lat, lon,jd, zi,rain, Ss, cp=None, sigH=None, zrf_u=10.0, zrf_t=10.0, zrf_q=10.0):   
 #**************************************************************************
@@ -712,7 +713,7 @@ def coare36vn_zrf_et(u, zu , t, zt, rh, zq, P, ts, sw_dn, lw_dn, lat, lon,jd, zi
     # recompute rhoa10 with 10-m values of everything else.
     rhoa10 = P10 * 100.0 / (np.multiply(Rgas * (T10 + T2K),(1 + 0.61 * (Q10 / 1000))))
     ############  Other wave breaking statistics from Banner-Morison wave model
-    wc_frac = 0.00073 * (U10N - 2) ** 1.43
+    wc_frac = 0.00073 * ((U10N - 2) ** (1.43))
     wc_frac[U10 < 2.1] = 1e-05
     
     kk = np.array(np.where(np.isfinite(cp) == 1))
@@ -747,7 +748,7 @@ def coare36vn_zrf_et(u, zu , t, zt, rh, zq, P, ts, sw_dn, lw_dn, lat, lon,jd, zi
 def psit_26(zeta = None): 
     # computes temperature structure function
     dzeta = np.minimum(50,0.35 * zeta)
-    psi = - ((1 + 0.6667 * zeta) ** 1.5 + np.multiply(0.6667 * (zeta - 14.28),np.exp(- dzeta)) + 8.525)
+    psi = - (((1 + 0.6667 * zeta) ** (1.5)) + np.multiply(0.6667 * (zeta - 14.28),np.exp(- dzeta)) + 8.525)
     k = np.array(np.where(zeta < 0))
     x = (1 - 15 * zeta[k]) ** 0.5
     psik = 2 * np.log((1 + x) / 2)
@@ -950,47 +951,44 @@ def albedo_vector(sw_dn = None,jd = None,lon = None,lat = None,eorw = None):
 
 # This code executes if 'run coare36vn_zrf_et.py' is executed from iPython cmd line
 # Edit line 959 to indicate path to test data file
-if __name__ == '__main__':
-    # import numpy as np
-    # import os
-    # import util
-    # import matplotlib.pyplot as plt
-    
-    path = './'
-    fil = 'test_36_data.txt'   
-    data = np.genfromtxt(path+fil, skip_header=1)
-    u = data[:,1]
-    t = data[:,3]
-    rh = data[:,5]
-    P = data[:,7]
-    ts = data[:,8]
-    sw_dn = data[:,9]
-    lw_dn = data[:,10]
-    lat = data[:,11]
-    lon = data[:,12]
-    zi = data[:,13]
-    rain = data[:,14]
-    zu= data[:,2]
-    zt= data[:,4]
-    zq= data[:,6]
-    zrf_u=10.0;
-    zrf_t=10.0;
-    zrf_q=10.0;
-    Ss = data[:,15]
-    jd = data[:,0]
-    cp = data[:,16]
-    sigH = data[:,17]
-    
-    A=coare36vn_zrf_et(u, zu , t, zt, rh, zq, P, ts, sw_dn, lw_dn, lat, lon,jd, zi,rain, Ss, cp , sigH, zrf_u, zrf_t, zrf_q)
-    fnameA = os.path.join(path,'test_36_output_py_082022_withwavesinput.txt')
-    # A=coare36vn_zrf_et(u, zu , t, zt, rh, zq, P, ts, sw_dn, lw_dn, lat, lon,jd, zi,rain, Ss, None , None, zrf_u, zrf_t, zrf_q)
-    # fnameA = os.path.join(path,'test_36_output_py_082022_withnowavesinput.txt')
-    A_hdr = 'usr\ttau\thsb\thlb\thbb\thlwebb\ttsr\tqsr\tzo\tzot\tzoq\tCd\t'
-    A_hdr += 'Ch\tCe\tL\tzeta\tdT_skinx\tdq_skinx\tdz_skin\tUrf\tTrf\tQrf\t'
-    A_hdr += 'RHrf\tUrfN\tTrfN\tQrfN\tlw_net\tsw_net\tLe\trhoa\tUN\tU10\tU10N\t'
-    A_hdr += 'Cdn_10\tChn_10\tCen_10\thrain\tQs\tEvap\tT10\tT10N\tQ10\tQ10N\tRH10\t'
-    A_hdr += 'P10\trhoa10\tgust\twc_frac\tEdis'
-    np.savetxt(fnameA,A,fmt='%.18e',delimiter='\t',header=A_hdr)
+#if __name__ == '__main__':
+#    # import numpy as np
+#    # import os
+#    # import util
+#    # import matplotlib.pyplot as plt
+#    
+#    path = '/work/mh0731/m300868/10_COARE/'
+#    file = 'ngc4008_to_COARE_input_global_ocean_2020.nc'
+#    dataset = xr.open_dataset(path + file)
+#    u = dataset['u'].values
+#    t = dataset['t'].values
+#    rh = dataset['rh'].values
+#    P = dataset['P'].values
+#    ts = dataset['ts'].values
+#    sw_dn = dataset['sw_dn'].values
+#    lw_dn = dataset['lw_dn'].values
+#    lat = dataset['lat'].values
+#    lon = dataset['lon'].values
+#    zi = dataset['zi'].values
+#    rain = dataset['rain'].values
+#    zu = dataset['zu'].values
+#    zt = dataset['zt'].values
+#    zq = dataset['zq'].values
+#    Ss = dataset['Ss'].values
+#    jd = dataset['jd'].values
+#    #cp = dataset['cp'].values
+#    #sigH = dataset['sigH'].values
+#    
+#    A=coare36vn_zrf_et(u, zu , t, zt, rh, zq, P, ts, sw_dn, lw_dn, lat, lon,jd, zi,rain, Ss) #, cp , sigH, zrf_u, zrf_t, zrf_q)
+#    fnameA = os.path.join(path,'ngc4008_to_COARE_py_082022_withwavesinput_global_ocean.txt')
+#    # A=coare36vn_zrf_et(u, zu , t, zt, rh, zq, P, ts, sw_dn, lw_dn, lat, lon,jd, zi,rain, Ss, None , None, zrf_u, zrf_t, zrf_q)
+#    # fnameA = os.path.join(path,'test_36_output_py_082022_withnowavesinput.txt')
+#    A_hdr = 'usr\ttau\thsb\thlb\thbb\thlwebb\ttsr\tqsr\tzo\tzot\tzoq\tCd\t'
+#    A_hdr += 'Ch\tCe\tL\tzeta\tdT_skinx\tdq_skinx\tdz_skin\tUrf\tTrf\tQrf\t'
+#    A_hdr += 'RHrf\tUrfN\tTrfN\tQrfN\tlw_net\tsw_net\tLe\trhoa\tUN\tU10\tU10N\t'
+#    A_hdr += 'Cdn_10\tChn_10\tCen_10\thrain\tQs\tEvap\tT10\tT10N\tQ10\tQ10N\tRH10\t'
+#    A_hdr += 'P10\trhoa10\tgust\twc_frac\tEdis'
+#    np.savetxt(fnameA,A,fmt='%.18e',delimiter='\t',header=A_hdr)
     
    # test on signle value
    # A=coare36vn_zrf_et(u[0], zu[0], t[0], zt[0], rh[0], zq[0], P[0], ts[0], sw_dn[0], lw_dn[0], lat[0], lon[0],jd[0], zi[0],rain[0], Ss[0], cp[0] , sigH[0], zrf_u, zrf_t, zrf_q)
