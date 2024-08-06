@@ -1,5 +1,5 @@
 # COARE-algorithm
-Repository of the TOGA-COARE bulk air-sea flux algorithm in:
+This is a personal copy of the [orginal repository](https://github.com/NOAA-PSL/COARE-algorithm/blob/master/README.md) of the TOGA-COARE bulk air-sea flux algorithm in:
 - Python
 - MATLAB
 - FORTRAN
